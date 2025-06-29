@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MVC.BLL.Repositories;
 using MVC.DAL.Context;
 using MVC.DAL.Entities;
+using MVC.Presentation.MappingProfile.Resolvers;
 using System.Reflection;
 
 namespace MVC.Presentation;
@@ -26,6 +27,7 @@ public class Program
         builder.Services.AddScoped<IGenereicRepository<City>, GenereicRepository<City>>();
 
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        builder.Services.AddScoped<DepartmentListResolver>();
 
         var app = builder.Build();
         // Configure the HTTP request pipeline.

@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using MVC.DAL.Entities;
-using MVC.Presentation.ViewModels;
-
-namespace MVC.Presentation.Controllers
+﻿namespace MVC.Presentation.Controllers
 {
     public class EmployeeController : Controller
     {
@@ -32,32 +28,10 @@ namespace MVC.Presentation.Controllers
 
         public IActionResult Create()
         {
-            return View(BuildViewModel(new EmployeeViewModel()));
+            var employeeViewModel = _mapper.Map<EmployeeViewModel>(new Employee());
+            return View(employeeViewModel);
         }
-        private EmployeeViewModel BuildViewModel(EmployeeViewModel employeeViewModel)
-        {
-            employeeViewModel.GenderList = Enum.GetValues(typeof(Gender))
-                                               .Cast<Gender>()
-                                               .Select(g => new SelectListItem
-                                               {
-                                                   Value = ((int)g).ToString(),
-                                                   Text = g.ToString()
-                                               });
-            employeeViewModel.Departments = _departmentRepository.GetAll().Select(d => new SelectListItem
-            {
-                Value = d.Id.ToString(),
-                Text = d.Name
-            });
-            employeeViewModel.Countries = _countryRepository.GetAll().Select(c => new SelectListItem()
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name
-            });
 
-            return employeeViewModel;
-
-
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(EmployeeViewModel model)
@@ -94,11 +68,12 @@ namespace MVC.Presentation.Controllers
         {
             if (!id.HasValue) return BadRequest();
 
-            ViewBag.GenderList = new SelectList(Enum.GetValues(typeof(Gender)));
+
             var data = _repository.Get(id.Value);
             if (data is null) return NotFound();
+
             var employeeViewModel = _mapper.Map<EmployeeViewModel>(data);
-            employeeViewModel = BuildViewModel(employeeViewModel);
+
             employeeViewModel.IsEditMode = true;
             return View(employeeViewModel);
         }
@@ -111,7 +86,7 @@ namespace MVC.Presentation.Controllers
         public async Task<IActionResult> Edit([FromRoute] int id, EmployeeViewModel employee)
         {
             if (id != employee.Id) return BadRequest();
-            if (!ModelState.IsValid) View(BuildViewModel(new EmployeeViewModel()));
+            if (!ModelState.IsValid) View(_mapper.Map<EmployeeViewModel>(new Employee()));
 
             try
             {

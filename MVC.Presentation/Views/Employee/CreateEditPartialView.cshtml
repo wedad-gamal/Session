@@ -34,7 +34,7 @@
     <div class="form-group mt-1">
 
         @Html.LabelFor(model => model.Gender, new { @class = "form-control" })
-        @Html.DropDownListFor(model => model.Gender, Model.GenderList, "-select gender-", new { @class = "form-control" })
+        @Html.DropDownListFor(model => model.Gender, Model.GenderList, "-select gender-", new { @class = "form-control" }) 
 
         <span asp-validation-for="Gender" class="text-danger"></span>
     </div>
