@@ -1,0 +1,53 @@
+﻿@model EmployeeViewModel
+<div class="form-group">
+    <label asp-for="Id"></label>
+    <input readonly asp-for="Id" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="Name"></label>
+    <input readonly asp-for="Name" class="form-control" />
+</div>
+
+<div class="form-group">
+    <label asp-for="Address"></label>
+    <input readonly asp-for="Address" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="Salary"></label>
+    <input readonly asp-for="Salary" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="IsActive"></label>
+    @Html.DisplayFor(model => model.IsActive, new { @class = "form-control" })
+</div>
+<div class="form-group">
+    <label asp-for="Gender" class="form-control"></label>
+    @Html.DisplayFor(model => model.Gender, new { @class = "form-control" })
+</div>
+
+<div class="form-group">
+    <label asp-for="Phone"></label>
+    <input readonly asp-for="Phone" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="Email"></label>
+    <input readonly asp-for="Email" class="form-control" />
+</div>
+
+<div class="form-group">
+    <label asp-for="ImagePath">Profile Picture</label>
+    <img src="~/@Model.ImagePath" alt="Alternate Text" width="200" height="200"/>
+</div>
+
+ <div class="form-group">
+     <label asp-for="DepartmentId" >Department: </label>
+     @Html.DisplayTextFor(e => e.Department.Name)
+</div> 
+<div class="form-group">
+     <label asp-for="CountryId" >Country: </label>
+     @Html.DisplayTextFor(e => e.Country.Name)
+</div> 
+<div class="form-group">
+     <label asp-for="CityId" >City: </label>
+     @Html.DisplayTextFor(e => e.City.Name)
+</div> 

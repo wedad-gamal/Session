@@ -1,0 +1,46 @@
+﻿
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+
+    <nav>
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                @* html tag *@
+                <a class="nav-link" href="@Url.Action("Index", "Home")">Home</a>                
+            </li>
+            <li class="nav-item">
+                @* tag helper *@
+                <a class="nav-link" asp-controller="Home" asp-action="Index" asp-route-id="10" asp-route-name="test" >Home </a>
+            </li>
+            <li class="nav-item">
+                @* href *@
+                <a class="nav-link" href="/Home/Contact">Contact US</a>
+            </li>
+
+            <li class="nav-item">
+                @* html helper *@
+                @Html.ActionLink("Products", "Get", "Products", new { id = 1, name = "Test" }, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("About", "Home", new {id = 1, name = "test"})">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Contact", "Home")">Contact</a>
+            </li>
+        </ul>
+        
+    </nav>
+
+    <div>
+        @RenderBody()
+    </div>
+</body>
+</html>
