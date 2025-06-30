@@ -5,6 +5,11 @@
 <div>
     <a class=" btn btn-primary mt-3" asp-action="Create">Create New Employee</a>
 </div>
+
+<div class="form-group mt-5">
+    <input id="seachTxt" type="text" placeholder="search..." class="form-control"/>
+</div>
+
 @if (Model.Any())
 {
 
@@ -59,7 +64,7 @@
 
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tbody">
 
             @foreach (var item in Model)
             {
@@ -120,3 +125,41 @@ else
         <h2>No Departments</h2>
     </div>
 }
+
+
+
+<script>
+    $(document).ready(function(){
+
+    $("#seachTxt").on('input',function(){
+        var searchTxt = $('#seachTxt').val();
+        $.get('/Employee/GetALlIncludeName/' + searchTxt, function (data) {
+            $('#tbody').empty();
+                $.each(data.data, function (i, employee) {
+                       $('#tbody').append(`
+                                <tr>
+                                    <td>${employee.id}</td>
+                                    <td>${employee.name}</td>
+                                    <td>${employee.address}</td>
+                                    <td>${employee.salary}</td>
+                                    <td>${employee.isActive}</td>
+                                    <td>${employee.phone}</td>
+                                    <td>${employee.email}</td>
+                                    <td>${employee.gender}</td>
+                                    <td>${employee.departmentName}</td>
+                                    <td>${employee.countryName}</td>
+                                    <td>${employee.cityName}</td>
+                                    <td><a href="/Employee/Details/${employee.id}" class="btn btn-warning"><i class="fas fa-eye"></i> Details</a></td>
+                                    <td><a href="/Employee/Edit/${employee.id}" class="btn btn-warning"><i class="fas fa-edit"></i> Edit</a></td>
+                                    <td><a href="/Employee/Delete/${employee.id}" class="btn btn-warning"><i class="fas fa-trash"></i> Delete</a></td>
+                                </tr>
+                            `);
+                });
+
+                
+            });
+    });
+    
+
+    })
+</script>

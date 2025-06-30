@@ -2,27 +2,17 @@
 {
     public class EmployeeController : Controller
     {
-        private readonly IGenereicRepository<Employee> _repository;
-        private readonly IDepartmentRepository _departmentRepository;
-        private readonly IGenereicRepository<City> _cityRepository;
-        private readonly IGenereicRepository<Country> _countryRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public EmployeeController(IGenereicRepository<Employee> repository,
-            IDepartmentRepository departmentRepository,
-            IGenereicRepository<City> cityRepository,
-            IGenereicRepository<Country> countryRepository,
-            IMapper mapper)
+        public EmployeeController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _repository = repository;
-            _departmentRepository = departmentRepository;
-            _cityRepository = cityRepository;
-            _countryRepository = countryRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
         public IActionResult Index()
         {
-            var data = _repository.GetAll();
+            var data = _unitOfWork.Employees.GetAll();
             return View(data);
         }
 
@@ -40,7 +30,8 @@
 
             Employee employee = await HandleAddEditingModel(model);
 
-            _repository.Add(employee);
+            _unitOfWork.Employees.Add(employee);
+            _unitOfWork.SaveChanges();
 
             return RedirectToAction(nameof(Index));
         }
@@ -69,7 +60,7 @@
             if (!id.HasValue) return BadRequest();
 
 
-            var data = _repository.Get(id.Value);
+            var data = _unitOfWork.Employees.Get(id.Value);
             if (data is null) return NotFound();
 
             var employeeViewModel = _mapper.Map<EmployeeViewModel>(data);
@@ -92,8 +83,9 @@
             {
                 var employeeViewModel = await HandleAddEditingModel(employee);
                 employeeViewModel.Id = employee.Id;
-                _repository.Update(employeeViewModel);
-                TempData["Message"] = "Edit Successfully";
+                _unitOfWork.Employees.Update(employeeViewModel);
+                if (_unitOfWork.SaveChanges() > 0)
+                    TempData["Message"] = "Edit Successfully";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -109,11 +101,12 @@
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmDelete(int? id)
         {
-            var employee = _repository.Get(id.Value);
+            var employee = _unitOfWork.Employees.Get(id.Value);
             try
             {
                 if (employee is null) return NotFound();
-                _repository.Delete(employee);
+                _unitOfWork.Employees.Delete(employee);
+                _unitOfWork.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -127,7 +120,7 @@
         [HttpGet("countries/{countryId}/cities")]
         public IActionResult GetCitiesByCountry(int countryId)
         {
-            var data = _cityRepository.GetAll()
+            var data = _unitOfWork.Cities.GetAll()
                 .Where(c => c.CountryId == countryId)
                 .Select(c => new CityViewModel()
                 {
@@ -138,6 +131,18 @@
             {
                 success = true,
                 data = data
+            });
+        }
+
+        [HttpGet("Employee/GetALlIncludeName/{name?}")]
+        public IActionResult GetALlIncludeName(string? name)
+        {
+            var data = _unitOfWork.Employees.GetALlIncludeName(name);
+            var employeesViewModel = _mapper.Map<IEnumerable<EmployeeViewModel>>(data);
+            return Ok(new
+            {
+                success = true,
+                data = employeesViewModel
             });
         }
 

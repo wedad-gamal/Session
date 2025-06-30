@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MVC.BLL.Repositories;
 using MVC.DAL.Context;
-using MVC.DAL.Entities;
 using MVC.Presentation.MappingProfile.Resolvers;
 using System.Reflection;
 
@@ -14,7 +13,10 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+        builder.Services//.AddRazorRuntimeCompilation()
+            .AddControllersWithViews();
+        //        builder.Services.ToJson(Newtonsoft.Json.Formatting.None);
+
 
         builder.Services.AddDbContext<DataContext>(options =>
         {
@@ -22,10 +24,10 @@ public class Program
             .UseLazyLoadingProxies();
         });
         builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-        builder.Services.AddScoped<IGenereicRepository<Employee>, GenereicRepository<Employee>>();
+        builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         builder.Services.AddScoped<IGenereicRepository<Country>, GenereicRepository<Country>>();
         builder.Services.AddScoped<IGenereicRepository<City>, GenereicRepository<City>>();
-
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         builder.Services.AddScoped<DepartmentListResolver>();
 

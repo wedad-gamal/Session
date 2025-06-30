@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MVC.BLL.Interfaces;
-using MVC.DAL.Context;
 
 namespace MVC.BLL.Repositories
 {
@@ -14,32 +12,16 @@ namespace MVC.BLL.Repositories
             _dbSet = _dataContext.Set<T>();
         }
 
-        public int Add(T entity)
-        {
-            _dbSet.Add(entity);
-            return _dataContext.SaveChanges();
-        }
+        public void Add(T entity) => _dbSet.Add(entity);
 
-        public void Delete(T entity)
-        {
-            _dbSet.Remove(entity);
-            _dataContext.SaveChanges();
-        }
+        public void Delete(T entity) => _dbSet.Remove(entity);
 
-        public void Delete(int id)
-        {
-            _dbSet.Remove(_dbSet.Find(id));
-            _dataContext.SaveChanges();
-        }
+        public void Delete(int id) => _dbSet.Remove(_dbSet.Find(id));
 
         public T? Get(int id) => _dbSet.Find(id);
 
         public IEnumerable<T> GetAll() => _dbSet.AsNoTracking().ToList();
 
-        public int Update(T entity)
-        {
-            _dbSet.Update(entity);
-            return _dataContext.SaveChanges();
-        }
+        public void Update(T entity) => _dbSet.Update(entity);
     }
 }
