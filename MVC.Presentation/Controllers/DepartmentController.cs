@@ -1,20 +1,18 @@
-﻿using MVC.DAL.Entities;
-
-namespace MVC.Presentation.Controllers
+﻿namespace MVC.Presentation.Controllers
 {
     public class DepartmentController : Controller
     {
-        private readonly IDepartmentRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DepartmentController(IDepartmentRepository departmentRepository)
+        public DepartmentController(IUnitOfWork unitOfWork)
         {
-            _repository = departmentRepository;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet] // default method for any action method
         public IActionResult Index()
         {
-            var data = _repository.GetAll();
+            var data = _unitOfWork.GetRepository<IDepartmentRepository>().GetAll();
 
             return View(data);
         }
@@ -30,8 +28,8 @@ namespace MVC.Presentation.Controllers
         {
             if (!ModelState.IsValid) return View(department);
 
-            _repository.Add(department);
-
+            _unitOfWork.GetRepository<IDepartmentRepository>().Add(department);
+            _unitOfWork.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
@@ -48,8 +46,8 @@ namespace MVC.Presentation.Controllers
 
             try
             {
-                _repository.Update(department);
-
+                _unitOfWork.GetRepository<IDepartmentRepository>().Update(department);
+                _unitOfWork.SaveChanges();
                 return RedirectToAction(nameof(Index));
 
             }
@@ -64,7 +62,7 @@ namespace MVC.Presentation.Controllers
         {
             if (!id.HasValue) return BadRequest();
 
-            var data = _repository.Get(id.Value);
+            var data = _unitOfWork.GetRepository<IDepartmentRepository>().Get(id.Value);
             if (data == null) return NotFound();
 
             return View(data);
@@ -79,9 +77,10 @@ namespace MVC.Presentation.Controllers
         {
             if (!id.HasValue) return BadRequest();
 
-            var department = _repository.Get(id.Value);
+            var department = _unitOfWork.GetRepository<IDepartmentRepository>().Get(id.Value);
             if (department == null) return NotFound();
-            _repository.Delete(department);
+            _unitOfWork.GetRepository<IDepartmentRepository>().Delete(department);
+            _unitOfWork.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
     }

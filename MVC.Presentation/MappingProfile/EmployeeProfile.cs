@@ -20,8 +20,8 @@ public class EmployeeProfile : Profile
     .ForMember(dest => dest.CountryName,
             opt => opt.MapFrom(src => src.Country != null ? src.Country.Name : ""))
     .ForMember(dest => dest.CityName,
-            opt => opt.MapFrom(src => src.City != null ? src.City.Name : ""))
+            opt => opt.MapFrom(src => src.City != null ? src.City.Name : ""));
 
-    .ReverseMap();
+        CreateMap<EmployeeViewModel, Employee>();
     }
 }

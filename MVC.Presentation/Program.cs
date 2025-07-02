@@ -23,6 +23,10 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             .UseLazyLoadingProxies();
         });
+
+
+
+
         builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
         builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         builder.Services.AddScoped<IGenereicRepository<Country>, GenereicRepository<Country>>();
@@ -30,7 +34,12 @@ public class Program
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         builder.Services.AddScoped<DepartmentListResolver>();
+        builder.Services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 
+        //builder.Services.AddScoped<Func<Type, object>>(provider =>
+        //{
+        //    return type => provider.GetRequiredService(type);
+        //});
         var app = builder.Build();
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())

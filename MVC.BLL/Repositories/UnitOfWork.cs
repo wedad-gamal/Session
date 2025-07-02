@@ -1,30 +1,25 @@
-﻿namespace MVC.BLL.Repositories
+﻿using System.Collections.Concurrent;
+
+namespace MVC.BLL.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IDepartmentRepository _departmentRepository;
-        private readonly IGenereicRepository<Country> _countryRepository;
-        private readonly IGenereicRepository<City> _cityRepoitory;
         private readonly DataContext _dataContext;
-
-        public UnitOfWork(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepository,
-            IGenereicRepository<Country> countryRepository, IGenereicRepository<City> cityRepoitory,
-            DataContext dataContext)
+        private readonly Func<Type, object> _serviceFactory;
+        private readonly ConcurrentDictionary<Type, object> _resolved = new();
+        public UnitOfWork(DataContext dataContext, Func<Type, object> serviceFactory)
         {
-            _employeeRepository = employeeRepository;
-            _departmentRepository = departmentRepository;
-            _countryRepository = countryRepository;
-            _cityRepoitory = cityRepoitory;
             _dataContext = dataContext;
+            _serviceFactory = serviceFactory;
         }
-        public IEmployeeRepository Employees => _employeeRepository;
 
-        public IDepartmentRepository Departments => _departmentRepository;
+        public TRepository GetRepository<TRepository>() where TRepository : class
+        {
+            return (TRepository)_resolved.GetOrAdd(typeof(TRepository), t => _serviceFactory(t));
+        }
 
-        public IGenereicRepository<Country> Countries => _countryRepository;
-
-        public IGenereicRepository<City> Cities => _cityRepoitory;
+        //to close connection between UnitOfWork and Database
+        public void Dispose() => _dataContext.Dispose();
 
         public int SaveChanges() => _dataContext.SaveChanges();
     }

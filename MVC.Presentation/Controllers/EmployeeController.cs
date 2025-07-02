@@ -12,7 +12,7 @@
         }
         public IActionResult Index()
         {
-            var data = _unitOfWork.Employees.GetAll();
+            var data = _unitOfWork.GetRepository<IEmployeeRepository>().GetAll();
             return View(data);
         }
 
@@ -26,11 +26,12 @@
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(EmployeeViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(_mapper.Map<EmployeeViewModel>(new Employee()));
 
             Employee employee = await HandleAddEditingModel(model);
 
-            _unitOfWork.Employees.Add(employee);
+            _unitOfWork.GetRepository<IEmployeeRepository>().Add(employee);
             _unitOfWork.SaveChanges();
 
             return RedirectToAction(nameof(Index));
@@ -60,7 +61,7 @@
             if (!id.HasValue) return BadRequest();
 
 
-            var data = _unitOfWork.Employees.Get(id.Value);
+            var data = _unitOfWork.GetRepository<IEmployeeRepository>().Get(id.Value);
             if (data is null) return NotFound();
 
             var employeeViewModel = _mapper.Map<EmployeeViewModel>(data);
@@ -77,13 +78,14 @@
         public async Task<IActionResult> Edit([FromRoute] int id, EmployeeViewModel employee)
         {
             if (id != employee.Id) return BadRequest();
-            if (!ModelState.IsValid) View(_mapper.Map<EmployeeViewModel>(new Employee()));
+            if (!ModelState.IsValid)
+                return View(_mapper.Map<EmployeeViewModel>(new Employee()));
 
             try
             {
                 var employeeViewModel = await HandleAddEditingModel(employee);
                 employeeViewModel.Id = employee.Id;
-                _unitOfWork.Employees.Update(employeeViewModel);
+                _unitOfWork.GetRepository<IEmployeeRepository>().Update(employeeViewModel);
                 if (_unitOfWork.SaveChanges() > 0)
                     TempData["Message"] = "Edit Successfully";
                 return RedirectToAction(nameof(Index));
@@ -101,11 +103,11 @@
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmDelete(int? id)
         {
-            var employee = _unitOfWork.Employees.Get(id.Value);
+            var employee = _unitOfWork.GetRepository<IEmployeeRepository>().Get(id.Value);
             try
             {
                 if (employee is null) return NotFound();
-                _unitOfWork.Employees.Delete(employee);
+                _unitOfWork.GetRepository<IEmployeeRepository>().Delete(employee);
                 _unitOfWork.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
@@ -120,7 +122,7 @@
         [HttpGet("countries/{countryId}/cities")]
         public IActionResult GetCitiesByCountry(int countryId)
         {
-            var data = _unitOfWork.Cities.GetAll()
+            var data = _unitOfWork.GetRepository<IGenereicRepository<City>>().GetAll()
                 .Where(c => c.CountryId == countryId)
                 .Select(c => new CityViewModel()
                 {
@@ -137,7 +139,7 @@
         [HttpGet("Employee/GetALlIncludeName/{name?}")]
         public IActionResult GetALlIncludeName(string? name)
         {
-            var data = _unitOfWork.Employees.GetALlIncludeName(name);
+            var data = _unitOfWork.GetRepository<IEmployeeRepository>().GetALlIncludeName(name);
             var employeesViewModel = _mapper.Map<IEnumerable<EmployeeViewModel>>(data);
             return Ok(new
             {

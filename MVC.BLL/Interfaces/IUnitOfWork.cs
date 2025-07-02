@@ -1,11 +1,8 @@
 ﻿namespace MVC.BLL.Interfaces
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
-        public IEmployeeRepository Employees { get; }
-        public IDepartmentRepository Departments { get; }
-        public IGenereicRepository<Country> Countries { get; }
-        public IGenereicRepository<City> Cities { get; }
+        TRepository GetRepository<TRepository>() where TRepository : class;
         public int SaveChanges();
     }
 }

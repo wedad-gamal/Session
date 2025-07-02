@@ -27,7 +27,7 @@ public class EmployeeViewModel
     [MaxLength(50)]
     public string? Phone { get; set; }
     public int? DepartmentId { get; set; }
-    public string DepartmentName { get; set; }
+    public string? DepartmentName { get; set; }
     public IEnumerable<SelectListItem> Departments { get; set; } = new HashSet<SelectListItem>();
     public IEnumerable<SelectListItem> GenderList { get; set; } = new HashSet<SelectListItem>();
     public IEnumerable<SelectListItem> Countries { get; set; } = new HashSet<SelectListItem>();
@@ -35,9 +35,9 @@ public class EmployeeViewModel
     public IFormFile? ProfilePicture { get; set; }
     public string ImagePath { get; set; } = string.Empty;
     public int? CountryId { get; set; }
-    public string CountryName { get; set; }
+    public string? CountryName { get; set; }
     public int? CityId { get; set; }
-    public string CityName { get; set; }
+    public string? CityName { get; set; }
     public bool IsEditMode { get; set; } = false;
 
 }
