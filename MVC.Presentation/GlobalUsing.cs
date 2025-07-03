@@ -1,6 +1,12 @@
 ﻿global using AutoMapper;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Rendering;
+global using Microsoft.EntityFrameworkCore;
 global using MVC.BLL.Interfaces;
+global using MVC.BLL.Repositories;
+global using MVC.DAL.Context;
 global using MVC.DAL.Entities;
+global using MVC.Presentation.MappingProfile.Resolvers;
 global using MVC.Presentation.ViewModels;
+global using Serilog;
+global using System.Reflection;

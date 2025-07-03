@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using MVC.BLL.Repositories;
-using MVC.DAL.Context;
-using MVC.Presentation.MappingProfile.Resolvers;
-using System.Reflection;
+
+
+using MVC.Presentation.Middlewares;
 
 namespace MVC.Presentation;
 
@@ -36,11 +34,26 @@ public class Program
         builder.Services.AddScoped<DepartmentListResolver>();
         builder.Services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 
-        //builder.Services.AddScoped<Func<Type, object>>(provider =>
-        //{
-        //    return type => provider.GetRequiredService(type);
-        //});
+        builder.Services.AddScoped<Func<Type, object>>(provider =>
+        {
+            return type => provider.GetRequiredService(type);
+        });
+
+        Log.Logger = new LoggerConfiguration()
+                    .Enrich.FromLogContext()
+                    .Enrich.WithThreadId()
+                    .Enrich.WithEnvironmentUserName()
+                    .MinimumLevel.Debug()
+                    .WriteTo.Console()
+                    .WriteTo.File("Logs/app-.log", rollingInterval: RollingInterval.Day)
+                    .WriteTo.Seq("http://localhost:5341") // seq
+                    .CreateLogger();
+
+        builder.Host.UseSerilog();
+
         var app = builder.Build();
+
+        app.UseMiddleware<RequestResponseLoggingMiddleware>();
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {

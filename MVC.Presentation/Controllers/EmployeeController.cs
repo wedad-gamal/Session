@@ -1,14 +1,18 @@
-﻿namespace MVC.Presentation.Controllers
+﻿using System.Text.Json;
+
+namespace MVC.Presentation.Controllers
 {
     public class EmployeeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ILogger<EmployeeController> _logger;
 
-        public EmployeeController(IUnitOfWork unitOfWork, IMapper mapper)
+        public EmployeeController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<EmployeeController> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
         public IActionResult Index()
         {
@@ -77,6 +81,12 @@
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromRoute] int id, EmployeeViewModel employee)
         {
+            var json = JsonSerializer.Serialize(employee, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            _logger.LogInformation("EmployeeViewModel:\n{Employee}", json);
+
             if (id != employee.Id) return BadRequest();
             if (!ModelState.IsValid)
                 return View(_mapper.Map<EmployeeViewModel>(new Employee()));
