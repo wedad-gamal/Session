@@ -1,5 +1,4 @@
-
-
+using Microsoft.AspNetCore.Identity;
 using MVC.Presentation.Middlewares;
 
 namespace MVC.Presentation;
@@ -22,6 +21,40 @@ public class Program
             .UseLazyLoadingProxies();
         });
 
+        builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+        builder.Services.AddTransient<IEmailService, EmailService>();
+
+        builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+            .AddEntityFrameworkStores<DataContext>()
+            .AddDefaultTokenProviders();
+        //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        //.AddCookie(options =>
+        //{
+        //    options.LoginPath = "/Account/Login";
+        //    options.AccessDeniedPath = "/Account/AccessDenied";
+        //});
+
+
+        //var configuration = builder.Configuration;
+        //builder.Services.AddAuthentication(options =>
+        //{
+        //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        //})
+        //.AddJwtBearer(options =>
+        //{
+        //    options.TokenValidationParameters = new TokenValidationParameters
+        //    {
+        //        ValidateIssuer = true,
+        //        ValidateAudience = true,
+        //        ValidateLifetime = true,
+        //        ValidateIssuerSigningKey = true,
+        //        ValidIssuer = configuration["Jwt:Issuer"],
+        //        ValidAudience = configuration["Jwt:Audience"],
+        //        IssuerSigningKey = new SymmetricSecurityKey(
+        //            Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+        //    };
+        //});
 
 
 
@@ -45,15 +78,21 @@ public class Program
                     .Enrich.WithEnvironmentUserName()
                     .MinimumLevel.Debug()
                     .WriteTo.Console()
-                    .WriteTo.File("Logs/app-.log", rollingInterval: RollingInterval.Day)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithCorrelationIdHeader("X-Correlation-ID") // or your preferred header
+                    .WriteTo.File("Logs/hrsystem-log-.txt", rollingInterval: RollingInterval.Day,
+                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] ({CorrelationId}) {Message:lj}{NewLine}{Exception}")
                     .WriteTo.Seq("http://localhost:5341") // seq
+
                     .CreateLogger();
 
         builder.Host.UseSerilog();
 
         var app = builder.Build();
 
+        app.UseMiddleware<CorrelationIdMiddleware>();
         app.UseMiddleware<RequestResponseLoggingMiddleware>();
+        //app.UseMiddleware<ResponseLoggingMiddleware>();
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {

@@ -33,7 +33,7 @@ public class EmployeeViewModel
     public IEnumerable<SelectListItem> Countries { get; set; } = new HashSet<SelectListItem>();
     public IEnumerable<SelectListItem> Cities { get; set; } = new HashSet<SelectListItem>();
     public IFormFile? ProfilePicture { get; set; }
-    public string ImagePath { get; set; } = string.Empty;
+    public string? ImagePath { get; set; } = string.Empty;
     public int? CountryId { get; set; }
     public string? CountryName { get; set; }
     public int? CityId { get; set; }

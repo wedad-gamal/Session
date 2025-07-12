@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 namespace MVC.Presentation.Middlewares;
 
@@ -15,25 +16,53 @@ public class RequestResponseLoggingMiddleware
 
     public async Task Invoke(HttpContext context)
     {
-        context.Request.EnableBuffering();
+        var stopwatch = Stopwatch.StartNew();
+        var request = context.Request;
+
+        request.EnableBuffering();
 
         string body = "";
-        if (context.Request.Method == HttpMethods.Post)
+        if (request.Method == HttpMethods.Post)
         {
-            using var reader = new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true);
+            using var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true);
             body = await reader.ReadToEndAsync();
-            context.Request.Body.Position = 0;
+            request.Body.Position = 0;
         }
 
-        var queryParams = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : "";
-        _logger.LogInformation("HTTP {Method} - Path: {Path}, Query: {Query}, Body: {Body}",
-            context.Request.Method,
-            context.Request.Path,
+        var queryParams = request.QueryString.HasValue ? request.QueryString.Value : "";
+        _logger.LogInformation("➡️ HTTP Request: {Method} {Path}{Query} | CorrelationId: {CorrelationId}",
+            request.Method,
+            request.Path,
             queryParams,
-            body);
-        await _next(context); // Continue down pipeline
+            context.Items["X-Correlation-ID"]);
 
-        var response = context.Response;
-        _logger.LogInformation("Outgoing Response: {StatusCode}", response.StatusCode);
+
+        try
+        {
+            await _next(context);
+            stopwatch.Stop();
+
+
+            var response = context.Response;
+
+            // Log Response Info
+            _logger.LogInformation("⬅️ HTTP Response: {StatusCode} | Duration: {Elapsed} ms",
+                context.Response.StatusCode,
+                stopwatch.ElapsedMilliseconds);
+
+        }
+        catch (Exception ex)
+        {
+
+            stopwatch.Stop();
+
+            _logger.LogError(ex, "🔥 Exception during HTTP Request {Method} {Path}. | CorrelationId: {CorrelationId} | Took {Elapsed} ms",
+                request.Method,
+                request.Path,
+                context.Items["X-Correlation-ID"],
+                stopwatch.ElapsedMilliseconds);
+
+            throw; // Re-throw to preserve pipeline behavior
+        }
     }
 }

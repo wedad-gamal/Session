@@ -1,0 +1,18 @@
+﻿@model EmailViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Contact Us</h1>
+
+<form asp-action="SendEmail" method="post" enctype="multipart/form-data">
+    <input asp-for="Email" />
+    <input asp-for="Subject" />
+    <textarea asp-for="Message"></textarea>
+
+    @* <input type="file" name="attachment" /> *@
+    
+    <button type="submit">Send</button>
+
+</form>

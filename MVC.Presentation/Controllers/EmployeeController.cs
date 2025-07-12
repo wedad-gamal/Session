@@ -1,7 +1,10 @@
-﻿using System.Text.Json;
+﻿using Microsoft.AspNetCore.Authorization;
+using MVC.Presentation.Utilies;
+using System.Text.Json;
 
 namespace MVC.Presentation.Controllers
 {
+    [Authorize]
     public class EmployeeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -37,6 +40,12 @@ namespace MVC.Presentation.Controllers
 
             _unitOfWork.GetRepository<IEmployeeRepository>().Add(employee);
             _unitOfWork.SaveChanges();
+            _logger.LogInformation("Created successfully. {CorrelationId}",
+                HttpContext.TraceIdentifier);
+
+
+
+            return Ok(new { Message = "Upload successful", CorrelationId = HttpContext.TraceIdentifier });
 
             return RedirectToAction(nameof(Index));
         }
@@ -47,14 +56,7 @@ namespace MVC.Presentation.Controllers
             Employee employee = _mapper.Map<EmployeeViewModel, Employee>(model);
             if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
             {
-                var fileName = Path.GetFileName(model.ProfilePicture.FileName);
-                var filePath = Path.Combine("wwwroot\\uploads", fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await model.ProfilePicture.CopyToAsync(stream);
-                }
-                employee.ImagePath = filePath.Substring(8);//remove wwwroot//
+                employee.ImagePath = await DocumentSettings.UploadFile(model.ProfilePicture, "uploads");
             }
 
             return employee;
@@ -98,6 +100,9 @@ namespace MVC.Presentation.Controllers
                 _unitOfWork.GetRepository<IEmployeeRepository>().Update(employeeViewModel);
                 if (_unitOfWork.SaveChanges() > 0)
                     TempData["Message"] = "Edit Successfully";
+                _logger.LogInformation("Edited successfully. {CorrelationId}",
+                HttpContext.TraceIdentifier);
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -118,7 +123,8 @@ namespace MVC.Presentation.Controllers
             {
                 if (employee is null) return NotFound();
                 _unitOfWork.GetRepository<IEmployeeRepository>().Delete(employee);
-                _unitOfWork.SaveChanges();
+                if (_unitOfWork.SaveChanges() > 0)
+                    DocumentSettings.DeleteFile(employee.ImagePath);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
