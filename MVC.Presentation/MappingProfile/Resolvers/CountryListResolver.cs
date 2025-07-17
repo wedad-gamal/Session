@@ -14,7 +14,7 @@ public class CountryListResolver : IValueResolver<Employee, EmployeeViewModel, I
     }
     public IEnumerable<SelectListItem> Resolve(Employee source, EmployeeViewModel destination, IEnumerable<SelectListItem> destMember, ResolutionContext context)
     {
-        return _genereicRepository.GetAll().Select(c => new SelectListItem()
+        return _genereicRepository.GetAllAsync().Result.Select(c => new SelectListItem()
         {
             Value = c.Id.ToString(),
             Text = c.Name

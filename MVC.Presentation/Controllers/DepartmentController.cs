@@ -12,7 +12,7 @@
         [HttpGet] // default method for any action method
         public IActionResult Index()
         {
-            var data = _unitOfWork.GetRepository<IDepartmentRepository>().GetAll();
+            var data = _unitOfWork.GetRepository<IDepartmentRepository>().GetAllAsync();
 
             return View(data);
         }
@@ -28,7 +28,7 @@
         {
             if (!ModelState.IsValid) return View(department);
 
-            _unitOfWork.GetRepository<IDepartmentRepository>().Add(department);
+            _unitOfWork.GetRepository<IDepartmentRepository>().AddAsync(department);
             _unitOfWork.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
@@ -62,7 +62,7 @@
         {
             if (!id.HasValue) return BadRequest();
 
-            var data = _unitOfWork.GetRepository<IDepartmentRepository>().Get(id.Value);
+            var data = _unitOfWork.GetRepository<IDepartmentRepository>().GetAsync(id.Value);
             if (data == null) return NotFound();
 
             return View(data);
@@ -73,11 +73,11 @@
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult ConfirmDelete(int? id)
+        public async Task<IActionResult> ConfirmDelete(int? id)
         {
             if (!id.HasValue) return BadRequest();
 
-            var department = _unitOfWork.GetRepository<IDepartmentRepository>().Get(id.Value);
+            var department = await _unitOfWork.GetRepository<IDepartmentRepository>().GetAsync(id.Value);
             if (department == null) return NotFound();
             _unitOfWork.GetRepository<IDepartmentRepository>().Delete(department);
             _unitOfWork.SaveChanges();

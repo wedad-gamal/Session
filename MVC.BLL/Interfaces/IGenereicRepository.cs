@@ -2,11 +2,11 @@
 {
     public interface IGenereicRepository<T>
     {
-        void Add(T entity);
+        Task AddAsync(T entity);
         void Delete(T entity);
-        void Delete(int id);
-        T? Get(int id);
-        IEnumerable<T> GetAll();
+        Task DeleteAsync(int id);
+        Task<T>? GetAsync(int id);
+        Task<IEnumerable<T>> GetAllAsync();
         void Update(T entity);
     }
 }

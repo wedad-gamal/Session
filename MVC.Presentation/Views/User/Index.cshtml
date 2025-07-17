@@ -103,7 +103,7 @@ else
 
     $("#seachTxt").on('input',function(){
         var searchTxt = $('#seachTxt').val();
-        $.get('/User/GetALlIncludeName/' + searchTxt, function (data) {
+        $.get('/user/search/' + searchTxt, function (data) {
             $('#tbody').empty();
                 $.each(data.data, function (i, user) {
                        $('#tbody').append(`

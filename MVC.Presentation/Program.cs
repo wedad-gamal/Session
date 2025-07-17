@@ -23,7 +23,8 @@ public class Program
 
         builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
         builder.Services.AddTransient<IEmailService, EmailService>();
-
+        builder.Services.AddScoped<IRoleService, RoleService>();
+        builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<DataContext>()
             .AddDefaultTokenProviders();

@@ -2,6 +2,6 @@
 {
     public interface IEmployeeRepository : IGenereicRepository<Employee>
     {
-        IEnumerable<Employee> GetALlIncludeName(string name);
+        Task<IEnumerable<Employee>> GetALlIncludeNameAsync(string name);
     }
 }

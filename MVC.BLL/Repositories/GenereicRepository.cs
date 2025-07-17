@@ -12,15 +12,15 @@ namespace MVC.BLL.Repositories
             _dbSet = _dataContext.Set<T>();
         }
 
-        public void Add(T entity) => _dbSet.Add(entity);
+        public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
 
         public void Delete(T entity) => _dbSet.Remove(entity);
 
-        public void Delete(int id) => _dbSet.Remove(_dbSet.Find(id));
+        public async Task DeleteAsync(int id) => _dbSet.Remove(await _dbSet.FindAsync(id));
 
-        public T? Get(int id) => _dbSet.Find(id);
+        public async Task<T>? GetAsync(int id) => await _dbSet.FindAsync(id);
 
-        public IEnumerable<T> GetAll() => _dbSet.AsNoTracking().ToList();
+        public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.AsNoTracking().ToListAsync();
 
         public void Update(T entity) => _dbSet.Update(entity);
     }

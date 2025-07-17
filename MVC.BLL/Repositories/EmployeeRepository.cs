@@ -1,5 +1,7 @@
 ﻿
 
+using Microsoft.EntityFrameworkCore;
+
 namespace MVC.BLL.Repositories
 {
     public class EmployeeRepository : GenereicRepository<Employee>, IEmployeeRepository
@@ -8,9 +10,9 @@ namespace MVC.BLL.Repositories
         {
         }
 
-        public IEnumerable<Employee> GetALlIncludeName(string name)
+        public async Task<IEnumerable<Employee>> GetALlIncludeNameAsync(string name)
         {
-            var data = _dbSet.Where(e => string.IsNullOrEmpty(name) || e.Name.ToLower().Contains(name.ToLower())).ToList();
+            var data = await _dbSet.Where(e => string.IsNullOrEmpty(name) || e.Name.ToLower().Contains(name.ToLower())).ToListAsync();
             return data;
         }
     }

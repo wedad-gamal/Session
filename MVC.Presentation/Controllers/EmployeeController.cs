@@ -19,7 +19,7 @@ namespace MVC.Presentation.Controllers
         }
         public IActionResult Index()
         {
-            var data = _unitOfWork.GetRepository<IEmployeeRepository>().GetAll();
+            var data = _unitOfWork.GetRepository<IEmployeeRepository>().GetAllAsync();
             return View(data);
         }
 
@@ -38,7 +38,7 @@ namespace MVC.Presentation.Controllers
 
             Employee employee = await HandleAddEditingModel(model);
 
-            _unitOfWork.GetRepository<IEmployeeRepository>().Add(employee);
+            _unitOfWork.GetRepository<IEmployeeRepository>().AddAsync(employee);
             _unitOfWork.SaveChanges();
             _logger.LogInformation("Created successfully. {CorrelationId}",
                 HttpContext.TraceIdentifier);
@@ -67,7 +67,7 @@ namespace MVC.Presentation.Controllers
             if (!id.HasValue) return BadRequest();
 
 
-            var data = _unitOfWork.GetRepository<IEmployeeRepository>().Get(id.Value);
+            var data = _unitOfWork.GetRepository<IEmployeeRepository>().GetAsync(id.Value);
             if (data is null) return NotFound();
 
             var employeeViewModel = _mapper.Map<EmployeeViewModel>(data);
@@ -116,9 +116,9 @@ namespace MVC.Presentation.Controllers
 
         [HttpPost, ActionName("delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult ConfirmDelete(int? id)
+        public async Task<IActionResult> ConfirmDelete(int? id)
         {
-            var employee = _unitOfWork.GetRepository<IEmployeeRepository>().Get(id.Value);
+            var employee = await _unitOfWork.GetRepository<IEmployeeRepository>().GetAsync(id.Value);
             try
             {
                 if (employee is null) return NotFound();
@@ -136,15 +136,15 @@ namespace MVC.Presentation.Controllers
         }
 
         [HttpGet("countries/{countryId}/cities")]
-        public IActionResult GetCitiesByCountry(int countryId)
+        public async Task<IActionResult> GetCitiesByCountry(int countryId)
         {
-            var data = _unitOfWork.GetRepository<IGenereicRepository<City>>().GetAll()
-                .Where(c => c.CountryId == countryId)
-                .Select(c => new CityViewModel()
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                });
+            var data = await _unitOfWork.GetRepository<IGenereicRepository<City>>().GetAllAsync();
+            var result = data.Where(c => c.CountryId == countryId)
+                        .Select(c => new CityViewModel()
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                        });
             return Ok(new
             {
                 success = true,
@@ -155,7 +155,7 @@ namespace MVC.Presentation.Controllers
         [HttpGet("Employee/GetALlIncludeName/{name?}")]
         public IActionResult GetALlIncludeName(string? name)
         {
-            var data = _unitOfWork.GetRepository<IEmployeeRepository>().GetALlIncludeName(name);
+            var data = _unitOfWork.GetRepository<IEmployeeRepository>().GetALlIncludeNameAsync(name);
             var employeesViewModel = _mapper.Map<IEnumerable<EmployeeViewModel>>(data);
             return Ok(new
             {

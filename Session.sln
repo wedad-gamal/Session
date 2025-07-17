@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC.DAL", "MVC.DAL\MVC.DAL.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC.BLL", "MVC.BLL\MVC.BLL.csproj", "{FC342CF7-80BE-48BE-9838-6ED4F94E195D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC.Test", "MVC.Test\MVC.Test.csproj", "{C32D7A57-EAC5-472F-8368-D2CCD9C0C68D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{FC342CF7-80BE-48BE-9838-6ED4F94E195D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC342CF7-80BE-48BE-9838-6ED4F94E195D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC342CF7-80BE-48BE-9838-6ED4F94E195D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C32D7A57-EAC5-472F-8368-D2CCD9C0C68D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C32D7A57-EAC5-472F-8368-D2CCD9C0C68D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C32D7A57-EAC5-472F-8368-D2CCD9C0C68D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C32D7A57-EAC5-472F-8368-D2CCD9C0C68D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
